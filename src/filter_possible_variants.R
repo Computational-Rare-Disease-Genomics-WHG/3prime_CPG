@@ -22,8 +22,8 @@ if(is.null(opt$input) || is.null(opt$output)) {
 dt <- fread(opt$input)
 
 cols <- c("chrom", "pos", "ref", "alt", "type",
-  "consequence", "transcript_id", "cons_score",
-  "gc", "CpG", "mam_phastcons", "mam_phylop",
+  "consequence", "CpG", "cons_score",
+  "gc", "transcript_id", "mam_phastcons", "mam_phylop",
   "gerp_rs", "gerp_rs_pval", "gerp_n", "gerp_s")
 
 names(dt) <- cols
