@@ -1,0 +1,5 @@
+CADD: /well/whiffin/projects/cadd
+gnomAD: /well/whiffin/shared/gnomAD
+mane:  /well/whiffin/users/wdf915/Projects/3prime_CPG/data/mane.txt
+methylation: /well/whiffin/users/wdf915/Projects/3prime_CPG/data/context_prepared_methyl14_weighted_logit.methyl_level.bed.gz
+output_dir: /well/whiffin/users/wdf915/Projects/3prime_CPG/data
