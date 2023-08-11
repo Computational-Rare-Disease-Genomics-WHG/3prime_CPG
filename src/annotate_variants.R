@@ -50,7 +50,7 @@ selected_chrom <- opt$chrom
 
 # Setting up the possible variants
 dt[, variant_id := paste0('chr', variant_id)]
-dt[, chrom:= paste0('chr', selected_chrom)]
+dt$chrom <- paste0('chr', selected_chrom)
 setkey(dt, variant_id)
 
 # gnomAD
