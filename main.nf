@@ -76,17 +76,28 @@ process annotateVariants {
     """
 }
 
-process stackChromosomes {
+process combineTSVFiles {
     input:
-    file "*.txt" from annotatedVariants
+    file '*.txt' from annotateVariants.flatten().collect()
+
+    output:
+    file 'all_possible_cpg_variants.tsv.gz'
 
     script:
     """
-    # Assuming that you have a script to stack the chroms on top of each other.
-    # If not, replace with the proper command.
-    source scripts/stack_chroms.sh
+    # Take the header from the first file
+    cat \$(ls *.tsv.gz | head -n 1) | head -n 1 > all_possible_cpg_variants.tsv
+
+    # Concatenate the content without headers
+    for file in *.txt; do
+        cat \$file | tail -n +2 >> all_possible_cpg_variants.tsv
+    done
+
+    # Compress the combined file
+    bgzip all_possible_cpg_variants.tsv
     """
 }
+
 
 workflow {
     // Step 1: Extract the desired columns from CADD
@@ -105,5 +116,5 @@ workflow {
     annotateVariants()
 
     // Step 6: Stack the chroms on top of each other
-    stackChromosomes()
+    combineTSVFiles()
 }
