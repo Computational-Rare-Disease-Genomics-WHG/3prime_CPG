@@ -28,7 +28,7 @@ def reverse_complement_bases(bases: hl.expr.StringExpression) -> hl.expr.StringE
     return hl.delimit(hl.range(bases.length() - 1, -1, -1).map(lambda i: flip_base(bases[i])), '')
 
 
-def collapse_strand(ht: Union[hl.Table, hl.MatrixTable]) -> hl.Table: 
+def collapse_strand(ht: Union[hl.Table, hl.MatrixTable]) -> hl.Table:
     """
     Collapse a strand ht
     """
@@ -66,7 +66,7 @@ def annotate_variant_types(
     variant_type_model_expr = hl.if_else(t.cpg, t.context, 'non-CpG')
 
     return t.annotate(
-            variant_type=variant_type_expr, 
+            variant_type=variant_type_expr,
             variant_type_model=variant_type_model_expr
     )
 

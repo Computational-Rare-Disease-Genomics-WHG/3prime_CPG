@@ -3,8 +3,8 @@ data/
 pipeline/src/database/*.db
 
 
-# Don't add nextflow files 
-.nextflow/ 
+# Don't add nextflow files
+.nextflow/
 .nextflow.log.*
 work/
 

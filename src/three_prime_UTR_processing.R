@@ -34,12 +34,12 @@ rev.comp<-function(x,rev=TRUE)
   xx<-unlist(strsplit(x,NULL))
   for (bbb in 1:nchar(x))
   {
-    if(xx[bbb]=="A") y[bbb]<-"T"        
-    if(xx[bbb]=="C") y[bbb]<-"G"        
-    if(xx[bbb]=="G") y[bbb]<-"C"        
+    if(xx[bbb]=="A") y[bbb]<-"T"
+    if(xx[bbb]=="C") y[bbb]<-"G"
+    if(xx[bbb]=="G") y[bbb]<-"C"
     if(xx[bbb]=="T") y[bbb]<-"A"
   }
-  if(rev==FALSE) 
+  if(rev==FALSE)
   {
     for(ccc in (1:nchar(x)))
     {
@@ -55,7 +55,7 @@ rev.comp<-function(x,rev=TRUE)
       if(ccc==1) yy<-zz[ccc] else yy<-paste(yy,zz[ccc],sep="")
     }
   }
-  return(yy)    
+  return(yy)
 }
 
 setwd("C:/Users/makbo/Desktop/Whiffin")
@@ -79,7 +79,7 @@ UTR_subset$chr <- gsub("chr", "", UTR_subset$chr)
 
 
 #tab delim file with 3' UTR positions (chr, start, end) (change UTR_subset code to get table in correct format)
-# write.table(UTR_subset, file="data/UTR_coords.bed", sep="\t", row.names = FALSE, 
+# write.table(UTR_subset, file="data/UTR_coords.bed", sep="\t", row.names = FALSE,
 #             col.names = FALSE, quote = FALSE)
 
 ###reading in and cleaning up MANE transcript data and sequences
@@ -109,7 +109,7 @@ for (r in 1:length(s)){
 }
 beep(3)
 
-#dataframe with all the information of the transcripts 
+#dataframe with all the information of the transcripts
 info <- data.frame(matrix(unlist(s), ncol=9, byrow=T))
 rownames(info) <- c(1:length(names(transcripts)))
 colnames(info) <- c("ID","cDNA","position","gene","gene_biotype",
@@ -132,7 +132,7 @@ colnames(positions) <- c("chr","start","end","strand")
 #combine transcript and position info
 info <- cbind(info, positions)[,c(-2)]
 #add a + symbol in front of forward strand transcripts
-info$strand[info$strand != "-1"] <- 
+info$strand[info$strand != "-1"] <-
   sub("^", "+", info$strand[info$strand != "-1"])
 
 #make positions into integers
@@ -152,7 +152,7 @@ mane <- read.delim("data/MANE.GRCh38.v1.0.ensembl_genomic.gff", header = FALSE)
 
 
 v9 <- as.data.frame(str_split_fixed(mane$V9, ";", 13))
-colnames(v9) <- c("ID", "parent", "gene_id", "transcript_id", "gene_type", 
+colnames(v9) <- c("ID", "parent", "gene_id", "transcript_id", "gene_type",
                   "gene_name", "transcript_type", "transcript_name", "exon_number",
                   "exon_id", "tag", "protein_id")
 
@@ -177,7 +177,7 @@ pb <- txtProgressBar(min=0,max = nrow(ms), initial = 1)
 for (r in 1:nrow(ms)){
   if (ms$exon_number[r] != 1){
     next
-  }  
+  }
   x <- TRUE
   count <- 1
   ms$exon_length[r] <- abs(ms$V5[r] - ms$V4[r])+1
@@ -202,7 +202,7 @@ for (r in 1:nrow(ms)){
     } else {
       ms$total_exon_length[r:(r+count)] <- sum(exon_lens)
       ms$exon_positions[r:(r+count)] <- list(exon_positions)
-      x <- FALSE 
+      x <- FALSE
     }
   }
   setTxtProgressBar(pb,r)
@@ -233,10 +233,10 @@ beep(3)
 
 # df with coordinates and 3' UTR sequences
 
-info_new <- info_ms[,c(2, 6, 7)] 
+info_new <- info_ms[,c(2, 6, 7)]
 
 info_new$UTR_sequence <- strsplit(as.character(info_new$UTR_sequence), "")
-# df with per base coordinates, in 3' UTRs 
+# df with per base coordinates, in 3' UTRs
 info_new <- unnest(info_new, c(UTR_sequence, exon_positions))
 
 info_new <- info_new[!duplicated(info_new),]
@@ -245,7 +245,7 @@ info_new <- info_new[order(info_new$chr, info_new$exon_positions),]
 
 colnames(info_new) <- c("chromosome","position","ref_base")
 
-# write.table(info_new, file="data/base_positions_UTR.txt", sep="\t", row.names = FALSE, 
+# write.table(info_new, file="data/base_positions_UTR.txt", sep="\t", row.names = FALSE,
 #             col.names = TRUE, quote = FALSE)
 
 #############################
@@ -259,17 +259,14 @@ colnames(methylation) <- c("chromosome", "position", "methylation", "base_strand
 methylation$chromosome <- gsub("chr", "", methylation$chromosome)
 methylation <- methylation[!duplicated(methylation),]
 
-# match methylation data to the base by position 
+# match methylation data to the base by position
 combined_data <- merge(info_new, methylation, by = c("chromosome", "position"), all=T)
 
 # remove extra entries (~470) that occured during merge (not sure why this happened)
-combined_data <- inner_join(combined_data, info_new) 
+combined_data <- inner_join(combined_data, info_new)
 
-# write.table(combined_data, file="data/base_positions_methylation_UTR.txt", sep="\t", row.names = FALSE, 
+# write.table(combined_data, file="data/base_positions_methylation_UTR.txt", sep="\t", row.names = FALSE,
 #             col.names = TRUE, quote = FALSE)
 
 ###########################
 combined_data <- read.delim("data/base_positions_methylation_UTR.txt", header = TRUE)
-
-
-
