@@ -1,7 +1,7 @@
 # transcripts.R
 # E. D'Souza
 
-# Read and the MANE transcripts and 
+# Read and the MANE transcripts and
 # their annotations and turn it into a
 # a readable csv file
 
@@ -111,4 +111,3 @@ mane_rna_dt[, chromosome := NULL]
 # Save transcript sequences data table in file
 fwrite(mane_rna_dt, output_rna_file_path,
        sep = "\t")
-

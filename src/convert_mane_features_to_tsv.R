@@ -13,13 +13,13 @@ option_list <- list(
     make_option(c("-m", "--mane-gff"),
         dest = "mane_gff",
         type = "character",
-        help = "dataset file name (should be .gff)", 
+        help = "dataset file name (should be .gff)",
         metavar = "character"
     ),
     make_option(c("-o", "--output-file"),
         dest = "output_file",
         type = "character",
-        help = "Output file name (should end in .tsv)", 
+        help = "Output file name (should end in .tsv)",
         metavar = "character"
     ),
 )
