@@ -4,6 +4,9 @@ library(data.table)
 library(magrittr)
 library(optparse)
 
+setDTthreads(0)
+
+
 # Named command line arguments
 option_list <- list(
   make_option(
