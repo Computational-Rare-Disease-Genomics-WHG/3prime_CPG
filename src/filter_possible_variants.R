@@ -5,6 +5,9 @@
 library(data.table)
 library(optparse)
 
+# Set threads to all available
+setDTthreads(0)
+
 # Argument parsing
 option_list <- list(
   make_option(c("-i", "--input"), type="character", default=NULL, help="Input file path"),

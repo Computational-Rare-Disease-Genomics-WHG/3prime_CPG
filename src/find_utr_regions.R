@@ -12,6 +12,9 @@ library("stringr")
 library("stringi")
 library("optparse")
 
+# Set threads
+setDTthreads(0)
+
 
 option_list <- list(
   make_option(
