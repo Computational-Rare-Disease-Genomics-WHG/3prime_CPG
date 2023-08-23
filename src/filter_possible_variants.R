@@ -5,6 +5,9 @@
 library(data.table)
 library(optparse)
 
+# Set threads to all available
+setDTthreads(0)
+
 # Argument parsing
 option_list <- list(
   make_option(c("-i", "--input"), type="character", default=NULL, help="Input file path"),
@@ -24,7 +27,10 @@ dt <- fread(opt$input)
 cols <- c("chrom", "pos", "ref", "alt", "type",
   "consequence", "CpG", "cons_score",
   "gc", "transcript_id", "mam_phastcons", "mam_phylop",
-  "gerp_rs", "gerp_rs_pval", "gerp_n", "gerp_s")
+  "gerp_rs", "gerp_rs_pval", "gerp_n", "gerp_s",
+  "spliceai-acc-gain", "spliceai-acc-loss",
+  "spliceai-don-gain", "spliceai-don-loss",
+  "cadd_raw", "cadd_phred")
 
 names(dt) <- cols
 

@@ -11,6 +11,9 @@ library("seqinr")
 library("stringr")
 library("optparse")
 
+setDTthreads(0)
+
+
 # Pass cmd line args
 parser <- OptionParser()
 
