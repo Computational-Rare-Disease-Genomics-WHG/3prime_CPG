@@ -12,14 +12,38 @@ library(tools)
 # Set the number of threads to use
 setDTthreads(0)
 
-# Read and process data
-dt <- fread("possible_variants_all_chrs.txt")
+ # Read and process data
+dt <- fread("../data/possible_variants_all_chrs.txt")
 dt[is.na(methyl_level), methyl_level := 0]
 dt[, frequency_status := ifelse(
   observed_in_gnomad == TRUE,
   ifelse(info_ac == 1, "Singleton", "AC > 1"),
   "Not observed in gnomAD"
 )]
+dt[, consequence := toTitleCase(gsub("PRIME", "'", gsub("_", " ", consequence)))]
+transcript_list <- unique(dt$transcript_id)
+
+# Get LOEUF scores and add them to the gnomAD_set
+constraint <- fread("../data/gnomad.v2.1.1.lof_metrics.by_transcript.txt")
+constraint %<>% .[,.(transcript, oe_lof_lower)]
+constraint <- unique(constraint)
+names(constraint) <- c("transcript_id", "loeuf")
+constraint %<>% .[transcript_id %in% transcript_list]
+
+deciles <- quantile(constraint$loeuf, prob=seq(0,1,length.out=10), na.rm=T)
+
+constraint[, loeuf_decile := as.numeric(cut(loeuf, 
+                                             deciles, 
+                                             include.lowest=T, 
+                                             label=F))]
+
+
+setkey(dt, transcript_id)
+setkey(constraint, transcript_id)
+dt <- constraint[dt]
+
+
+
 # Create a summary version of the dataset
 summary_dt <- dt[,
                  .N,
@@ -85,6 +109,7 @@ meth_summary_dt$frequency_status <-
     levels = c("Not observed in gnomAD", "Singleton", "AC > 1")
   )
 
+
 # Plot
 ggplot(meth_summary_dt,
        aes(x = methyl_level, y = proportion, fill = frequency_status)) +
@@ -110,7 +135,7 @@ ggplot(meth_summary_dt,
 ## CpG sites with an observed variant in gnomAD
 
 prop_dt <- summary_dt[
-  methyl_level > 4
+  methyl_level >= 7
   , .(num_observed = sum(.SD[observed_in_gnomad == TRUE]$N),
       num_not_observed = sum(.SD[observed_in_gnomad == FALSE]$N)),
   by = .(consequence)]
@@ -167,7 +192,7 @@ ggplot(prop_dt, aes(x = consequence, y = prop)) +
 ## sites with an observed variant but factor by frequency status
 
 prop_ac_dt <- meth_summary_dt[
-  methyl_level > 4
+  methyl_level >= 7
   , .(
     num_observed_singleton = sum(.SD[frequency_status == 'Singleton']$N),
     num_observed_ac_geq_1 = sum(.SD[frequency_status == 'AC > 1']$N),
@@ -233,7 +258,7 @@ ggplot(prop_ac_dt_long,
   geom_col() +
   coord_flip() +
 
-  labs(title = "Fraction of methylated CpG sites with an observed variant in gnomAD", # nolint
+  labs(title = "Fraction of methylated (ML>=7) CpG sites with an observed variant in gnomAD", # nolint
        x = NULL,
        y = "Fraction of variants",
        fill = "Frequency Status") +
@@ -259,23 +284,23 @@ sampled_dt <- dt[,
 
 # Reshape the data for plotting
 melted_data <- melt(
-  sampled_dt[methyl_level > 4],
+  sampled_dt[methyl_level >= 7 & loeuf_decile %in% c(1,2)],
   id.vars = c("consequence", "observed_in_gnomad"),
-  measure.vars = c("gerp_rs", "mam_phylop", "cons_score"),
+  measure.vars = c("gerp_rs", "mam_phylop", "cadd_phred"),
   variable.name = "Score_Type",
   value.name = "Score"
 )
-# Faceted plot
-# Faceted plot
-melted_data[,
-  consequence := toTitleCase(gsub("PRIME", "'", gsub("_", " ", consequence)))]
+
+melted_data <- na.omit(melted_data)
+
 
 # Faceted plot with enhancements
 ggplot(melted_data,
-       aes(x = consequence, y = Score, fill = observed_in_gnomad)) +
-  geom_boxplot() +  # this hides the outliers; remove if you want to show them
+       aes(x = consequence, y = Score)) +
+  #geom_violin(aes(fill = observed_in_gnomad), width=1.3, trim = FALSE, position = position_dodge(0.9)) +  # this hides the outliers; remove if you want to show them
+  geom_boxplot(aes(fill = observed_in_gnomad), width=0.8)+
   labs(
-    title = "Distribution of Evolutionary Scores by Consequence (Methylation Level > 4)", # nolint
+    title = "Distribution of Evolutionary Scores by Consequence (Methylation Level >= 7) (LOEUF Top 20%)", # nolint
     subtitle = "Separated by GERP++, PhyloP and
     CADD Scores",
     y = "Score Value",
@@ -292,3 +317,89 @@ ggplot(melted_data,
     plot.subtitle = element_text(size = 13, hjust = 0.5)
   ) +
   facet_wrap(~ Score_Type, scales = "free_y", ncol = 1)
+
+
+### Analyses requested by Nicky 
+ndt <- dt[methyl_level >= 7 & loeuf_decile %in% c(1,2)]
+
+# Table 1 
+dt[,.N, by=consequence] %>% View
+ndt[methyl_level >= 7 , .N, by=consequence] %>% View
+ndt[methyl_level >= 7 & frequency_status=="Singleton", .N, by=consequence] %>% View
+ndt[methyl_level >= 7 & frequency_status=="AC > 1", .N, by=consequence] %>% View
+
+# Table 2
+freq_meth_dt <- meth_summary_dt [,.(count=sum(N)), by=.(methyl_level, frequency_status)]
+setorder(freq_meth_dt, frequency_status, methyl_level)
+freq_meth_dt %>% View
+
+# Rename
+ndt %<>% .[
+  consequence %in% c("5PRIME_UTR",
+                     "SYNONYMOUS",
+                     "3PRIME_UTR", 
+                     "STOP_GAINED",
+                     "CANONICAL_SPLICE",
+                     "NON_SYNONYMOUS", 
+                     "INTRONIC")
+]
+ndt[
+  consequence %in% c("STOP_GAINED", "CANONICAL_SPLICE"),
+  consequence := "LoF"
+]
+
+# Plot GERP, PhyloP, and PhastCons scores between 
+# observed and not observed
+# in gnomAD for each consequence
+sampled_ndt <- ndt[frequency_status %in% c("AC > 1", "Not observed in gnomAD")]
+
+# Reshape the data for plotting
+melted_data <- melt(
+  sampled_ndt,
+  id.vars = c("consequence", "observed_in_gnomad"),
+  measure.vars = c("mam_phylop"),
+  variable.name = "Score_Type",
+  value.name = "Score"
+)
+melted_data <- na.omit(melted_data)
+
+# Perform a statistical test 
+melted_data[, consequence_num := .GRP, by = consequence]
+p_values <- melted_data[, .(p_value = wilcox.test(Score[observed_in_gnomad == T], Score[observed_in_gnomad == F], exact = FALSE)$p.value),
+                        by = .(consequence, consequence_num)]
+
+# Convert p-values to significance labels
+p_values[, signif_label := fcase(
+  p_value < 0.001, "***",
+  p_value < 0.01,  "**",
+  p_value < 0.05,  "*",
+  default = "n.s."
+)]
+y_position <- max(melted_data$Score) * 1.1
+ggplot(melted_data, aes(x = consequence_num, y = Score)) +
+  geom_violin(aes(fill = observed_in_gnomad, x=factor(consequence_num)), width=1.3, trim = FALSE, position=position_dodge(1)) +
+  geom_boxplot(aes(fill = observed_in_gnomad, x=factor(consequence_num)), color='black', width=0.1, position=position_dodge(1), outlier.shape = NA) +
+  geom_segment(data = p_values, aes(x = consequence_num - 0.4, xend = consequence_num + 0.4, y = y_position, yend = y_position), color = "black") +
+  geom_text(data = p_values, aes(x = consequence_num, y = y_position, label = signif_label), vjust = -0.5, color = "black") +
+  scale_x_discrete(breaks = unique(melted_data$consequence_num), labels = unique(melted_data$consequence))+
+  labs(
+    title = "Distribution of PhyloP Scores by Consequence",
+    subtitle = "Methylation Level >= 7",
+    y = "log(PhyloP Score)",
+    x = "Consequence",
+    fill = "Observed in gnomAD"
+  ) +
+  scale_fill_brewer(palette = "Set1") +
+  theme_light() +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    legend.position = "bottom",
+    strip.text = element_text(size = 12, face = "bold"),
+    plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
+    plot.subtitle = element_text(size = 13, hjust = 0.5)
+  )
+
+
+
+
+
