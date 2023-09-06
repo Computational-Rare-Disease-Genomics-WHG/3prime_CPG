@@ -65,7 +65,18 @@ empty_dt <- as.data.table(
 # Read input data
 selected_chrom <- opt$chromosome
 dt <- fread(opt$input)
-ukbb <- ifelse(selected_chrom != "Y", fread(opt$ukbb), empty_dt)
+
+# Read in frequency table from
+# UKBB, unless if its a "Y"
+# then use the empty DT
+# created above
+ukbb <- data.table()
+
+if (selected_chrom == "Y"){
+    ukbb <- empty_dt
+} else {
+    ukbb <- fread(opt$ukbb)
+}
 
 # UK Biobank manipulation
 names(ukbb) <- column_names
