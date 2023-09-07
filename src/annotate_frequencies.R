@@ -1,15 +1,16 @@
 # Annotates the possible variants with
-# UK Biobank frequency and methylation level
+# gnomAD UK Biobank frequency and methylation level
 
 # Note that UK Biobank doesn't have any frequency
 # information available for the Y chromosome
 
 # Example usage:
-# Rscript annotate_biobank_variants.R \
-#   -i data/possible_variants_chr1_with_gnomad.txt \
-#   -u data/ukbb_chr1.afreq \
-#   -o data/possible_variants_chr1_with_gnomad_and_ukbb.txt \
-#   -c 1
+# Rscript annotate_frequencies.R \
+#   -i data/possible_variants/possible_variants_chr${chr}_with_methylation.txt \
+#   -u data/ukbb/ukbb_chr${chr}.afreq \
+#   -g data/gnomad/gnomad_chr${chr}.txt \
+#   -o data/possible_variants_chr${chr}_with_af.txt \
+#   -c ${chr}
 
 library(data.table)
 library(magrittr)
@@ -24,6 +25,8 @@ setDTthreads(0)
 option_list <- list(
     make_option(c("-i", "--input"), type = "character", default = NULL,
                 help = "Input file"),
+    make_option(c("-g", "--gnomad"), type = "character", default = NULL,
+                help = "gnomAD file"),
     make_option(c("-u", "--ukbb"), type = "character", default = NULL,
                 help = "UKBB variant file"),
     make_option(c("-c", "--chromosome"), type = "character", default = NULL,
@@ -37,6 +40,7 @@ opt <- parse_args(opt_parser)
 
 if (is.null(opt$input) ||
     is.null(opt$ukbb) ||
+    is.null(opt$gnomad) ||
     is.null(opt$chromosome) ||
     is.null(opt$output)) {
     stop("Please provide input and output file paths using -i/--input, -g/--ukbb, and -o/--output options.") # nolint
@@ -47,24 +51,34 @@ if (opt$chromosome == "Y") {
 }
 
 # From the summary log within PLINK2
+# Needed to calculate the allele count
 ukbb_total_samples <- 200031
 ukbb_males <- 89918
 ukbb_females <- 110088
 ukbb_nosex <- 25
-column_names <- c("chrom", "id", "ref", "alt", "ukbb_af", "ukbb_an")
 
-# Create an empty data.table for Y
+ukbb_column_names <- c("chrom", "id", "ref", "alt", "ukbb_af", "ukbb_an")
+gnomad_column_names <- c("chrom", "pos", "ref", "alt", "qual",
+"gnomad_ac", "gnomad_af", "gnomad_an", "variant_id")
+
+# Create an empty data.table for ukbb Y
 empty_dt <- as.data.table(
     setNames(
         data.frame(matrix(
-            ncol = length(column_names), nrow = 0)),
-        column_names
+            ncol = length(ukbb_column_names), nrow = 0)),
+        ukbb_column_names
     )
 )
 
 # Read input data
 selected_chrom <- opt$chromosome
 dt <- fread(opt$input)
+gnomad <- fread(opt$gnomad)
+
+
+# Work through gnomAD manipulation
+names(gnomad) <- gnomad_column_names
+gnomad %<>% .[, .(variant_id, gnomad_ac, gnomad_af, gnomad_an)]
 
 # Read in frequency table from
 # UKBB, unless if its a "Y"
@@ -79,7 +93,7 @@ if (selected_chrom == "Y"){
 }
 
 # UK Biobank manipulation
-names(ukbb) <- column_names
+names(ukbb) <- ukbb_column_names
 
 # Filter the data to possible CpG variants only
 ukbb %<>% .[(ref == "C" & alt == "T") | (ref == "G" & alt == "C")]
@@ -97,7 +111,6 @@ if (selected_chrom == "X") {
 # Get the position
 grep_string <- paste0("chr", selected_chrom, ":|:SG")
 ukbb[, pos := as.numeric(gsub(grep_string, "", id))]
-ukbb[, id := NULL]
 
 # Create the variant ID
 ukbb[, variant_id := paste0(
@@ -106,15 +119,19 @@ ukbb[, variant_id := paste0(
 # Select the columns
 ukbb %<>% .[, .(variant_id, ukbb_ac, ukbb_af, ukbb_an)]
 
-# Set the key
-setkey(ukbb, variant_id)
-
 # Merge the data
+setkey(gnomad, variant_id)
+setkey(dt, variant_id)
+setkey(ukbb, variant_id)
 dt <- ukbb[dt]
+dt <- gnomad[dt]
+
 
 # Create a column for the observed in UKBB
 dt[is.na(ukbb_af), observed_in_ukbb := FALSE]
 dt[!is.na(ukbb_af), observed_in_ukbb := TRUE]
+dt[is.na(gnomad_af), observed_in_gnomad := FALSE]
+dt[!is.na(gnomad_af), observed_in_gnomad := TRUE]
 
 # Write the data to file
 fwrite(
