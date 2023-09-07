@@ -35,7 +35,7 @@ option_list <- list(
 opt_parser <- OptionParser(option_list = option_list)
 opt <- parse_args(opt_parser)
 
-if(is.null(opt$input) ||
+if (is.null(opt$input) ||
     is.null(opt$ukbb) ||
     is.null(opt$chromosome) ||
     is.null(opt$output)) {
@@ -80,10 +80,19 @@ if (selected_chrom == "Y"){
 
 # UK Biobank manipulation
 names(ukbb) <- column_names
-ukbb %<>% .[, .(id, ref, alt, ukbb_af, ukbb_an)]
 
-# Filter the data to CpG variants only
+# Filter the data to possible CpG variants only
 ukbb %<>% .[(ref == "C" & alt == "T") | (ref == "G" & alt == "C")]
+
+# Calculate the Allele Count
+if (selected_chrom == "X") {
+    ukbb[, ukbb_ac := round(
+        ukbb_af * ((ukbb_females + ukbb_nosex) * 2 + ukbb_males))]
+} else {
+    ukbb[, ukbb_ac := round(ukbb_af * ukbb_total_samples * 2)]
+}
+
+# Construct variant ID
 
 # Get the position
 grep_string <- paste0("chr", selected_chrom, ":|:SG")
@@ -94,13 +103,8 @@ ukbb[, id := NULL]
 ukbb[, variant_id := paste0(
     "chr", selected_chrom, "-", pos, "-", ref, "-", alt)]
 
-# Calculate the Allele Count
-if (selected_chrom == "X") {
-    ukbb[, ukbb_ac := round(
-        ukbb_af * ((ukbb_females + ukbb_nosex) * 2 + ukbb_males))]
-} else {
-    ukbb[, ukbb_ac := round(ukbb_af * ukbb_total_samples * 2)]
-}
+# Select the columns
+ukbb %<>% .[, .(variant_id, ukbb_ac, ukbb_af, ukbb_an)]
 
 # Set the key
 setkey(ukbb, variant_id)
