@@ -1,5 +1,5 @@
 # Annotates the possible variants with
-# gnomAD UK Biobank frequency and methylation level
+# gnomAD + UK Biobank frequency and methylation level
 
 # Note that UK Biobank doesn't have any frequency
 # information available for the Y chromosome
@@ -9,7 +9,7 @@
 #   -i data/possible_variants/possible_variants_chr${chr}_with_methylation.txt \
 #   -u data/ukbb/ukbb_chr${chr}.afreq \
 #   -g data/gnomad/gnomad_chr${chr}.txt \
-#   -o data/possible_variants_chr${chr}_with_af.txt \
+#   -o data/possible_variants/possible_variants_chr${chr}_with_af.txt \
 #   -c ${chr}
 
 library(data.table)
