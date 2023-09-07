@@ -96,7 +96,7 @@ if (selected_chrom == "Y"){
 names(ukbb) <- ukbb_column_names
 
 # Filter the data to possible CpG variants only
-ukbb %<>% .[(ref == "C" & alt == "T") | (ref == "G" & alt == "C")]
+ukbb %<>% .[(ref == "C" & alt == "T") | (ref == "G" & alt == "A")]
 
 # Calculate the Allele Count
 if (selected_chrom == "X") {
@@ -125,7 +125,6 @@ setkey(dt, variant_id)
 setkey(ukbb, variant_id)
 dt <- ukbb[dt]
 dt <- gnomad[dt]
-
 
 # Create a column for the observed in UKBB
 dt[is.na(ukbb_af), observed_in_ukbb := FALSE]
