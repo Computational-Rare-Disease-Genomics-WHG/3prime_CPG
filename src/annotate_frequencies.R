@@ -57,7 +57,7 @@ ukbb_males <- 89918
 ukbb_females <- 110088
 ukbb_nosex <- 25
 
-ukbb_column_names <- c("chrom", "id", "ref", "alt", "ukbb_af", "ukbb_an")
+ukbb_column_names <- c("chrom", "id", "ref", "alt", "ukbb_ac", "ukbb_an")
 gnomad_column_names <- c("chrom", "pos", "ref", "alt", "qual",
 "gnomad_ac", "gnomad_af", "gnomad_an", "variant_id")
 
@@ -98,13 +98,8 @@ names(ukbb) <- ukbb_column_names
 # Filter the data to possible CpG variants only
 ukbb %<>% .[(ref == "C" & alt == "T") | (ref == "G" & alt == "A")]
 
-# Calculate the Allele Count
-if (selected_chrom == "X") {
-    ukbb[, ukbb_ac := round(
-        ukbb_af * ((ukbb_females + ukbb_nosex) * 2 + ukbb_males))]
-} else {
-    ukbb[, ukbb_ac := round(ukbb_af * ukbb_total_samples * 2)]
-}
+# Calculate the Allele frequencies
+ukbb[, ukbb_af := ukbb_ac / ukbb_an]
 
 # Construct variant ID
 
