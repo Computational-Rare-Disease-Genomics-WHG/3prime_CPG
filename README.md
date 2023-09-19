@@ -10,9 +10,12 @@ TBD
 Firstly, you can install the input data using the download_init.sh script available.
 
 ```bash
+
 chmod a+x download_init.sh
 ./download_init.sh
+
 ```
+
 This installs all of the data dependencies that are required. There is however additional methylation and UK Biobank / gnomAD data that is required to the pipeline.
 
 Update `config.yaml` for the path to the respective datasets once downloaded.
@@ -22,7 +25,9 @@ The pipeline within this repository can be reproduced using Nextflow. Install Ne
 There is a reproducible docker image available at `docker pull elstonndsouza/3primeCpG:latest`. Although, this Docker image can be also be rebuilt if installation is difficult on your target platform of choice.
 
 ```bash
+
 nextflow run main.nf -c config.yaml -profile local
+
 ```
 
 ## Plan

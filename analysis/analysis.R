@@ -32,9 +32,9 @@ constraint %<>% .[transcript_id %in% transcript_list]
 
 deciles <- quantile(constraint$loeuf, prob=seq(0,1,length.out=10), na.rm=T)
 
-constraint[, loeuf_decile := as.numeric(cut(loeuf, 
-                                             deciles, 
-                                             include.lowest=T, 
+constraint[, loeuf_decile := as.numeric(cut(loeuf,
+                                             deciles,
+                                             include.lowest=T,
                                              label=F))]
 
 
@@ -188,7 +188,7 @@ ggplot(prop_dt, aes(x = consequence, y = prop)) +
   ) +
   scale_fill_brewer(palette = "Set3")
 
-#### Plot 4 : Find the fraction of methylated CpG 
+#### Plot 4 : Find the fraction of methylated CpG
 ## sites with an observed variant but factor by frequency status
 
 prop_ac_dt <- meth_summary_dt[
@@ -242,7 +242,7 @@ prop_ac_dt_long$frequency_status <- factor(
 # proportion of unobserved variants
 prop_ac_dt_long_ord <-
   prop_ac_dt_long[
-    frequency_level == "prop_unobserved", 
+    frequency_level == "prop_unobserved",
     .(consequence, ord = frank(proportion))]
 setkey(prop_ac_dt_long_ord, consequence)
 setkey(prop_ac_dt_long, consequence)
@@ -276,7 +276,7 @@ ggplot(prop_ac_dt_long,
 # Sample a 1000 positions for each group and write to file
 # Separate them by methylation level
 sampled_dt <- dt[,
-  .SD[sample(.N, 3000, replace = TRUE)], 
+  .SD[sample(.N, 3000, replace = TRUE)],
   by = .(consequence, observed_in_gnomad)]
 
 # Plot GERP, PhyloP, and PhastCons scores between observed and not observed
@@ -319,10 +319,10 @@ ggplot(melted_data,
   facet_wrap(~ Score_Type, scales = "free_y", ncol = 1)
 
 
-### Analyses requested by Nicky 
+### Analyses requested by Nicky
 ndt <- dt[methyl_level >= 7 & loeuf_decile %in% c(1,2)]
 
-# Table 1 
+# Table 1
 dt[,.N, by=consequence] %>% View
 ndt[methyl_level >= 7 , .N, by=consequence] %>% View
 ndt[methyl_level >= 7 & frequency_status=="Singleton", .N, by=consequence] %>% View
@@ -337,10 +337,10 @@ freq_meth_dt %>% View
 ndt %<>% .[
   consequence %in% c("5PRIME_UTR",
                      "SYNONYMOUS",
-                     "3PRIME_UTR", 
+                     "3PRIME_UTR",
                      "STOP_GAINED",
                      "CANONICAL_SPLICE",
-                     "NON_SYNONYMOUS", 
+                     "NON_SYNONYMOUS",
                      "INTRONIC")
 ]
 ndt[
@@ -348,7 +348,7 @@ ndt[
   consequence := "LoF"
 ]
 
-# Plot GERP, PhyloP, and PhastCons scores between 
+# Plot GERP, PhyloP, and PhastCons scores between
 # observed and not observed
 # in gnomAD for each consequence
 sampled_ndt <- ndt[frequency_status %in% c("AC > 1", "Not observed in gnomAD")]
@@ -363,7 +363,7 @@ melted_data <- melt(
 )
 melted_data <- na.omit(melted_data)
 
-# Perform a statistical test 
+# Perform a statistical test
 melted_data[, consequence_num := .GRP, by = consequence]
 p_values <- melted_data[, .(p_value = wilcox.test(Score[observed_in_gnomad == T], Score[observed_in_gnomad == F], exact = FALSE)$p.value),
                         by = .(consequence, consequence_num)]
@@ -398,8 +398,3 @@ ggplot(melted_data, aes(x = consequence_num, y = Score)) +
     plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
     plot.subtitle = element_text(size = 13, hjust = 0.5)
   )
-
-
-
-
-
