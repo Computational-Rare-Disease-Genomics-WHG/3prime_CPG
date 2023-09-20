@@ -11,8 +11,36 @@ Firstly, you can install the input data using the download_init.sh script availa
 
 ```bash
 
-chmod a+x download_init.sh
-./download_init.sh
+# Download reference sequence
+./download_init.sh --data refseq --output "./data" --yaml_file "config.yaml"
+
+# Download refseq
+./download_init.sh --data refseq_assembly --output "./data" --yaml_file "config.yaml"
+
+# Download mane
+./download_init.sh --data mane --output "./data" --yaml_file "config.yaml"
+
+# Download loeuf
+./download_init.sh --data loeuf --output "./data" --yaml_file "config.yaml"
+
+# Download cpg_island
+./download_init.sh --data cpg_island --output "./data" --yaml_file "config.yaml"
+
+# Download dnase
+./download_init.sh --data dnase --output "./data" --yaml_file "config.yaml"
+
+# Download polya
+./download_init.sh --data polya --output "./data" --yaml_file "config.yaml"
+
+# Download ancestral sequence
+./download_init.sh --data ensembl_ancestral --output "./data" --yaml_file "config.yaml"
+
+# Download miRNA
+./download_init.sh --data mirna --output "./data" --yaml_file "config.yaml"
+
+# Download Histone Methylation
+./download_init.sh --data histone_methylation --output "./data" --yaml_file "config.yaml"
+
 
 ```
 

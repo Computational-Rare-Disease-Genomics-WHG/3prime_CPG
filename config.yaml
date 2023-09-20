@@ -3,3 +3,18 @@ gnomAD: /well/whiffin/shared/gnomAD
 mane:  /well/whiffin/users/wdf915/Projects/3prime_CPG/data/mane.txt
 methylation: /well/whiffin/users/wdf915/Projects/3prime_CPG/data/context_prepared_methyl14_weighted_logit.methyl_level.bed.gz
 output_dir: /well/whiffin/users/wdf915/Projects/3prime_CPG/data
+
+ukbb: /Users/edsouza/Projects/CRDG/3prime_CPG/data/ukbb
+refseq_assembly: /Users/edsouza/Projects/CRDG/3prime_CPG/data/assembly_report.txt
+mane_summary: /Users/edsouza/Projects/CRDG/3prime_CPG/data/MANE.GRCh38.v1.0.summary.txt.gz
+mane_transcript: /Users/edsouza/Projects/CRDG/3prime_CPG/data/MANE.GRCh38.v1.0.ensembl_rna.fna.gz
+mane_gff: /Users/edsouza/Projects/CRDG/3prime_CPG/data/MANE.GRCh38.v1.0.ensembl_genomic.gff.gz
+loeuf: /Users/edsouza/Projects/CRDG/3prime_CPG/data/gnomad.v2.1.1.lof_metrics.by_transcript.txt.bgz
+cpg_island: /Users/edsouza/Projects/CRDG/3prime_CPG/data/cpgIslandExtUnmasked.txt.gz
+dnase_peaks: /Users/edsouza/Projects/CRDG/3prime_CPG/data/wgEncodeRegDnaseClustered.txt.gz
+polya_miner: /Users/edsouza/Projects/CRDG/3prime_CPG/data/Human_hg38.PolyA_DB.bed
+polya_db: /Users/edsouza/Projects/CRDG/3prime_CPG/data/human.PAS.txt
+polya_site_unibas: /Users/edsouza/Projects/CRDG/3prime_CPG/data/atlas.clusters.2.0.GRCh38.96.bed.gz
+ensembl_ancestral: /Users/edsouza/Projects/CRDG/3prime_CPG/data/homo_sapiens_ancestor_GRCh38
+mirna: /Users/edsouza/Projects/CRDG/3prime_CPG/data/All_Target_Locations
+histone_methylation: /Users/edsouza/Projects/CRDG/3prime_CPG/data/E062-H3K9me3.bed
