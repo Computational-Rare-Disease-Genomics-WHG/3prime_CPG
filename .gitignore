@@ -1,7 +1,5 @@
 # Don't add data to git
 data/
-pipeline/src/database/*.db
-
 
 # Don't add nextflow files
 .nextflow/
