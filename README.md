@@ -11,36 +11,11 @@ Firstly, you can install the input data using the download_init.sh script availa
 
 ```bash
 
-# Download reference sequence
-./download_init.sh --data refseq --output "./data" --yaml_file "config.yaml"
+data_types=("refseq" "refseq_assembly" "mane" "loeuf" "cpg_island" "dnase" "polya" "ensembl_ancestral" "mirna" "histone_methylation")
 
-# Download refseq
-./download_init.sh --data refseq_assembly --output "./data" --yaml_file "config.yaml"
-
-# Download mane
-./download_init.sh --data mane --output "./data" --yaml_file "config.yaml"
-
-# Download loeuf
-./download_init.sh --data loeuf --output "./data" --yaml_file "config.yaml"
-
-# Download cpg_island
-./download_init.sh --data cpg_island --output "./data" --yaml_file "config.yaml"
-
-# Download dnase
-./download_init.sh --data dnase --output "./data" --yaml_file "config.yaml"
-
-# Download polya
-./download_init.sh --data polya --output "./data" --yaml_file "config.yaml"
-
-# Download ancestral sequence
-./download_init.sh --data ensembl_ancestral --output "./data" --yaml_file "config.yaml"
-
-# Download miRNA
-./download_init.sh --data mirna --output "./data" --yaml_file "config.yaml"
-
-# Download Histone Methylation
-./download_init.sh --data histone_methylation --output "./data" --yaml_file "config.yaml"
-
+for data_type in "${data_types[@]}"; do
+    ./download_init.sh --data "$data_type" --output "./data" --yaml_file "config.yaml"
+done
 
 ```
 
