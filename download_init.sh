@@ -23,7 +23,6 @@ download_cadd() {
 download_refseq() {
     local output="$1"
     genomes_url="https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/001/405/GCA_000001405.15_GRCh38/GCA_000001405.15_GRCh38_genomic.fna.gz"
-
     # Download RefSeq data
     wget "$genomes_url" -O "${output}/human_genome_grch38.fna.gz" || exit 1
 }
@@ -128,6 +127,7 @@ download_mirna(){
     wget "$mirna_url" -O "${output}/All_Target_Locations.hg19.bed.zip"
     unzip "${output}/All_Target_Locations.hg19.bed.zip" -d "${output}/All_Target_Locations.hg19"
     rm  "${output}/All_Target_Locations.hg19.bed.zip"
+
 }
 
 # Function to append data to the YAML file
