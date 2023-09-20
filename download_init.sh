@@ -22,7 +22,7 @@ download_cadd() {
 # Function to download "refseq" data
 download_refseq() {
     local output="$1"
-    genomes_url="ftp://ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/annotation/GRCh38_latest/refseq_identifiers/GRCh38_latest_genomic.fna.gz"
+    genomes_url="https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/001/405/GCA_000001405.15_GRCh38/GCA_000001405.15_GRCh38_genomic.fna.gz"
 
     # Download RefSeq data
     wget "$genomes_url" -O "${output}/human_genome_grch38.fna.gz" || exit 1
@@ -118,6 +118,7 @@ download_ancestral_sequence(){
     ancestral_url="https://ftp.ensembl.org/pub/current_fasta/ancestral_alleles/homo_sapiens_ancestor_GRCh38.tar.gz"
     wget "$ancestral_url" -O "${output}/homo_sapiens_ancestor_GRCh38.tar.gz"
     tar -xvf "${output}/homo_sapiens_ancestor_GRCh38.tar.gz" -C "${output}"
+    rm "${output}/homo_sapiens_ancestor_GRCh38.tar.gz"
 }
 
 
@@ -125,7 +126,8 @@ download_mirna(){
     local output="$1"
     mirna_url="https://www.targetscan.org/vert_80/vert_80_data_download/All_Target_Locations.hg19.bed.zip"
     wget "$mirna_url" -O "${output}/All_Target_Locations.hg19.bed.zip"
-    unzip "${output}/All_Target_Locations.hg19.bed.zip" -d "${output}/All_Target_Locations"
+    unzip "${output}/All_Target_Locations.hg19.bed.zip" -d "${output}/All_Target_Locations.hg19"
+    rm  "${output}/All_Target_Locations.hg19.bed.zip"
 }
 
 # Function to append data to the YAML file
@@ -208,7 +210,7 @@ case $DATA in
         ;;
     mirna)
         download_mirna "$OUTPUT"
-        append_to_yaml "mirna" "$(realpath "$OUTPUT/All_Target_Locations")" "$YAML_FILE"
+        append_to_yaml "mirna" "$(realpath "$OUTPUT/All_Target_Locations.hg19")" "$YAML_FILE"
         ;;
     histone_methylation)
         download_histone_methylation "$OUTPUT"

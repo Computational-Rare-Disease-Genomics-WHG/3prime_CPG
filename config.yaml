@@ -16,5 +16,5 @@ polya_miner: /Users/edsouza/Projects/CRDG/3prime_CPG/data/Human_hg38.PolyA_DB.be
 polya_db: /Users/edsouza/Projects/CRDG/3prime_CPG/data/human.PAS.txt
 polya_site_unibas: /Users/edsouza/Projects/CRDG/3prime_CPG/data/atlas.clusters.2.0.GRCh38.96.bed.gz
 ensembl_ancestral: /Users/edsouza/Projects/CRDG/3prime_CPG/data/homo_sapiens_ancestor_GRCh38
-mirna: /Users/edsouza/Projects/CRDG/3prime_CPG/data/All_Target_Locations
+mirna: /Users/edsouza/Projects/CRDG/3prime_CPG/data/All_Target_Locations.hg19
 histone_methylation: /Users/edsouza/Projects/CRDG/3prime_CPG/data/E062-H3K9me3.bed
