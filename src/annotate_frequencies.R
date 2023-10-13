@@ -50,8 +50,8 @@ if (opt$chromosome == "Y") {
     print("UK Biobank doesn't have any frequency information available for the Y chromosome. Adding columns but doing nothing") # nolint
 }
 
-ukbb_column_names <- c("chrom", "pos", "ref", "alt", "qual", "filter",
-"ukbb_an", "ukbb_pass_an", "ukbb_ac", "ukbb_af", "ukbb_pass_ac")
+ukbb_column_names <- c("chrom","pos", "ref", "qual", "filter",
+"ukbb_an", "ukbb_pass_an", "alt", "ukbb_ac", "ukbb_af", "ukbb_pass_ac")
 gnomad_column_names <- c("chrom", "pos", "ref", "alt", "qual",
 "gnomad_ac", "gnomad_af", "gnomad_an", "variant_id")
 
@@ -94,19 +94,17 @@ if (selected_chrom == "Y"){
 # UK Biobank manipulation
 names(ukbb) <- ukbb_column_names
 
-# Filter the data to possible CpG variants only
-ukbb %<>% .[(ref == "C" & alt == "T") | (ref == "G" & alt == "A")]
-
 # Create the variant ID
 ukbb[, variant_id := paste0(chrom, "-", pos, "-", ref, "-", alt)]
 
 # Select the columns
 ukbb %<>% .[, .(variant_id, ukbb_ac, ukbb_af, ukbb_an)]
-ukbb[, `:=` (
-    ukbb_ac = as.integer(ukbb_ac),
-    ukbb_af = as.numeric(ukbb_af),
-    ukbb_an = as.integer(ukbb_an)
-)]
+ukbb[, `:=`(
+        ukbb_ac = as.integer(ukbb_ac),
+        ukbb_af = as.numeric(ukbb_af),
+        ukbb_an = as.integer(ukbb_an)
+    )
+]
 
 # Merge the data
 setkey(gnomad, variant_id)
