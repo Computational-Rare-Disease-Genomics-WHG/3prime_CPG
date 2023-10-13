@@ -74,9 +74,9 @@ gnomad <- fread(opt$gnomad)
 names(gnomad) <- gnomad_column_names
 gnomad %<>% .[, .(variant_id, gnomad_ac, gnomad_af, gnomad_an)]
 gnomad[, `:=`(
-    gnomad_ac = as.integer(gnomad_ac),
-    gnomad_af = as.numeric(gnomad_af),
-    gnomad_an = as.integer(gnomad_an)
+    gnomad_ac = suppressWarnings(as.integer(gnomad_ac)),
+    gnomad_af = suppressWarnings(as.numeric(gnomad_af)),
+    gnomad_an = suppressWarnings(as.integer(gnomad_an))
 )]
 
 # Read in frequency table from
@@ -85,7 +85,7 @@ gnomad[, `:=`(
 # created above
 ukbb <- data.table()
 
-if (selected_chrom == "Y"){
+if (selected_chrom == "Y") {
     ukbb <- empty_dt
 } else {
     ukbb <- fread(opt$ukbb)
@@ -100,9 +100,9 @@ ukbb[, variant_id := paste0(chrom, "-", pos, "-", ref, "-", alt)]
 # Select the columns
 ukbb %<>% .[, .(variant_id, ukbb_ac, ukbb_af, ukbb_an)]
 ukbb[, `:=`(
-        ukbb_ac = as.integer(ukbb_ac),
-        ukbb_af = as.numeric(ukbb_af),
-        ukbb_an = as.integer(ukbb_an)
+        ukbb_ac = suppressWarnings(as.integer(ukbb_ac)),
+        ukbb_af = suppressWarnings(as.numeric(ukbb_af)),
+        ukbb_an = suppressWarnings(as.integer(ukbb_an))
     )
 ]
 
