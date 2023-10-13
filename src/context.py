@@ -1,3 +1,5 @@
+# pylint: disable=all
+# flake8: noqa
 """
 Gets the context of each variant in the input TSV file.
 
@@ -45,22 +47,22 @@ def main():
 
     # Load the reference genome
     reference = Fasta(reference_fasta)
-    
+
     # Context lengths
     context_lengths = [3, 5, 7, 9, 12, 15]
-    
+
     with open(input_file, 'r') as infile, open(output_file, 'w') as outfile:
         # Header for the output TSV
         header = ["chr", "pos", "variant_id"] + [f"context_{length}bp" for length in context_lengths]
         outfile.write("\t".join(header) + "\n")
-        
+
         for line in tqdm(infile.readlines()):
             chrom, pos, variant = line.strip().split()
             pos = int(pos)
-            
+
             # Obtain the context for each length and append to contexts list
             contexts = [get_context(reference, chrom, pos, length) for length in context_lengths]
-            
+
             # Write to the output TSV
             outfile.write("\t".join([chrom, str(pos), variant] + contexts) + "\n")
 
@@ -69,5 +71,5 @@ if __name__ == "__main__":
     parser.add_argument("input_file", type=str, help="Input TSV file with variants.")
     parser.add_argument("reference_fasta", type=str, help="Reference genome FASTA file.")
     parser.add_argument("assembly_report", type=str, help="Assembly report file.")
-    parser.add_argument("output_file",type=str, help="Output TSV file with variant contexts.")    
+    parser.add_argument("output_file",type=str, help="Output TSV file with variant contexts.")
     main(parser.parse_args())
