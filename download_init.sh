@@ -94,11 +94,11 @@ download_polya(){
 
     # Download PolyA data
     wget "$poly_a_miner" -O "${output}/Human_hg38.PolyA_DB.bed"
-    wget "$poly_a_db" -O "${output}/human_pas.zip" 
+    wget "$poly_a_db" -O "${output}/human_pas.zip"
     wget "$unibas_poly_asite" -O "${output}/atlas.clusters.2.0.GRCh38.96.bed.gz"
 
     #unzip the human_pas.zip
-    unzip "${output}/human_pas.zip" -d "${output}/" 
+    unzip "${output}/human_pas.zip" -d "${output}/"
 
     # remove the zip file
     rm "${output}/human_pas.zip"

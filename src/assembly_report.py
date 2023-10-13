@@ -1,12 +1,15 @@
+# pylint: disable=all
+# flake8: noqa
+
 """
 assembly_report.py
 
 This script takes the assembly report from NCBI and creates a VCF header file
 and a tab delimited file with the contigs and their lengths.
 
-python3 assembly_report.py 
+python3 assembly_report.py
     --input ../../../data/pipeline/GCA_000001405.15_GRCh38_assembly_report.txt
-    --output assembly_report.txt 
+    --output assembly_report.txt
 """
 
 import argparse
