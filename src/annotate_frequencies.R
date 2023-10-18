@@ -50,14 +50,8 @@ if (opt$chromosome == "Y") {
     print("UK Biobank doesn't have any frequency information available for the Y chromosome. Adding columns but doing nothing") # nolint
 }
 
-# From the summary log within PLINK2
-# Needed to calculate the allele count
-ukbb_total_samples <- 200031
-ukbb_males <- 89918
-ukbb_females <- 110088
-ukbb_nosex <- 25
-
-ukbb_column_names <- c("chrom", "id", "ref", "alt", "ukbb_ac", "ukbb_an")
+ukbb_column_names <- c("chrom","pos", "ref", "qual", "filter",
+"ukbb_an", "ukbb_pass_an", "alt", "ukbb_ac", "ukbb_af", "ukbb_pass_ac")
 gnomad_column_names <- c("chrom", "pos", "ref", "alt", "qual",
 "gnomad_ac", "gnomad_af", "gnomad_an", "variant_id")
 
@@ -79,6 +73,11 @@ gnomad <- fread(opt$gnomad)
 # Work through gnomAD manipulation
 names(gnomad) <- gnomad_column_names
 gnomad %<>% .[, .(variant_id, gnomad_ac, gnomad_af, gnomad_an)]
+gnomad[, `:=`(
+    gnomad_ac = suppressWarnings(as.integer(gnomad_ac)),
+    gnomad_af = suppressWarnings(as.numeric(gnomad_af)),
+    gnomad_an = suppressWarnings(as.integer(gnomad_an))
+)]
 
 # Read in frequency table from
 # UKBB, unless if its a "Y"
@@ -86,7 +85,7 @@ gnomad %<>% .[, .(variant_id, gnomad_ac, gnomad_af, gnomad_an)]
 # created above
 ukbb <- data.table()
 
-if (selected_chrom == "Y"){
+if (selected_chrom == "Y") {
     ukbb <- empty_dt
 } else {
     ukbb <- fread(opt$ukbb)
@@ -95,29 +94,23 @@ if (selected_chrom == "Y"){
 # UK Biobank manipulation
 names(ukbb) <- ukbb_column_names
 
-# Filter the data to possible CpG variants only
-ukbb %<>% .[(ref == "C" & alt == "T") | (ref == "G" & alt == "A")]
-
-# Calculate the Allele frequencies
-ukbb[, ukbb_af := ukbb_ac / ukbb_an]
-
-# Construct variant ID
-
-# Get the position
-grep_string <- paste0("chr", selected_chrom, ":|:SG")
-ukbb[, pos := as.numeric(gsub(grep_string, "", id))]
-
 # Create the variant ID
-ukbb[, variant_id := paste0(
-    "chr", selected_chrom, "-", pos, "-", ref, "-", alt)]
+ukbb[, variant_id := paste0(chrom, "-", pos, "-", ref, "-", alt)]
 
 # Select the columns
 ukbb %<>% .[, .(variant_id, ukbb_ac, ukbb_af, ukbb_an)]
+ukbb[, `:=`(
+        ukbb_ac = suppressWarnings(as.integer(ukbb_ac)),
+        ukbb_af = suppressWarnings(as.numeric(ukbb_af)),
+        ukbb_an = suppressWarnings(as.integer(ukbb_an))
+    )
+]
 
 # Merge the data
 setkey(gnomad, variant_id)
 setkey(dt, variant_id)
 setkey(ukbb, variant_id)
+
 dt <- ukbb[dt]
 dt <- gnomad[dt]
 

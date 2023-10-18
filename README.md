@@ -7,7 +7,7 @@ CpG methylation plays a crucial role in gene regulation and genomic stability. I
 ## Research Questions
 
 1. Can a machine learning model predict whether a site falls into one of two classes: Variant or Invariant?
-   
+
 2. What sequence features are necessary to train this model?
    - Local Sequence Context
    - Presence of a CpG Island
@@ -39,7 +39,7 @@ CpG methylation plays a crucial role in gene regulation and genomic stability. I
 - [Intergenic, gene terminal, and intragenic CpG islands in the human genome](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2817693/#B24)
 - [A comprehensive catalog of CpG islands methylated in human lung adenocarcinomas for the identification of tumor suppressor genes](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4042824/)
 - [A curated census of pathogenic and likely pathogenic UTR variants and evaluation of deep learning models for variant effect prediction](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC8460052/)
-  
+
 
 ## Pipeline
 
@@ -69,6 +69,6 @@ nextflow run main.nf -c config.yaml -profile local
 
 ```
 
-## Machine Learning 
+## Machine Learning
 
 TODO

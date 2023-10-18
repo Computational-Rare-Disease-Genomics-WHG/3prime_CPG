@@ -1,3 +1,6 @@
+# pylint: disable=all
+# flake8: noqa
+
 """
 assembly_report.py
 

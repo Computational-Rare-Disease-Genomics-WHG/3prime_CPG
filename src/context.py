@@ -1,3 +1,5 @@
+# pylint: disable=all
+# flake8: noqa
 """
 Gets the context of each variant in the input TSV file.
 
@@ -59,7 +61,7 @@ def main(args):
             f'context_{length}bp' for length in context_lengths
         ]
         outfile.write('\t'.join(header) + '\n')
-
+        
         for line in tqdm(infile.readlines()):
             chrom, pos, variant = line.strip().split()
             pos = int(pos)
