@@ -13,40 +13,10 @@ library(tools)
 setDTthreads(0)
 
  # Read and process data
-dt <- fread("../data/possible_variants_all_chrs.txt")
-dt[is.na(methyl_level), methyl_level := 0]
-dt[, frequency_status := ifelse(
-  observed_in_gnomad == TRUE,
-  ifelse(info_ac == 1, "Singleton", "AC > 1"),
-  "Not observed in gnomAD"
-)]
-dt[, consequence := toTitleCase(gsub("PRIME", "'", gsub("_", " ", consequence)))]
-transcript_list <- unique(dt$transcript_id)
-
-# Get LOEUF scores and add them to the gnomAD_set
-constraint <- fread("../data/gnomad.v2.1.1.lof_metrics.by_transcript.txt")
-constraint %<>% .[,.(transcript, oe_lof_lower)]
-constraint <- unique(constraint)
-names(constraint) <- c("transcript_id", "loeuf")
-constraint %<>% .[transcript_id %in% transcript_list]
-
-deciles <- quantile(constraint$loeuf, prob=seq(0,1,length.out=10), na.rm=T)
-
-constraint[, loeuf_decile := as.numeric(cut(loeuf,
-                                             deciles,
-                                             include.lowest=T,
-                                             label=F))]
-
-
-setkey(dt, transcript_id)
-setkey(constraint, transcript_id)
-dt <- constraint[dt]
-
-
+dt <- fread("../data/possible_variants_all_chrs_with_af.txt")
 
 # Create a summary version of the dataset
-summary_dt <- dt[,
-                 .N,
+summary_dt <- dt[,.N,
                  by = .(observed_in_gnomad,
                         methyl_level,
                         consequence)]
@@ -59,7 +29,6 @@ setorder(summary_dt,
          observed_in_gnomad,
          consequence,
          methyl_level)
-
 
 ###### Plot 1 : CpG variants observed in gnomAD by methylation level
 
@@ -284,7 +253,7 @@ sampled_dt <- dt[,
 
 # Reshape the data for plotting
 melted_data <- melt(
-  sampled_dt[methyl_level >= 7 & loeuf_decile %in% c(1,2)],
+  sampled_dt[methyl_level >= 7],
   id.vars = c("consequence", "observed_in_gnomad"),
   measure.vars = c("gerp_rs", "mam_phylop", "cadd_phred"),
   variable.name = "Score_Type",
@@ -297,10 +266,9 @@ melted_data <- na.omit(melted_data)
 # Faceted plot with enhancements
 ggplot(melted_data,
        aes(x = consequence, y = Score)) +
-  #geom_violin(aes(fill = observed_in_gnomad), width=1.3, trim = FALSE, position = position_dodge(0.9)) +  # this hides the outliers; remove if you want to show them
   geom_boxplot(aes(fill = observed_in_gnomad), width=0.8)+
   labs(
-    title = "Distribution of Evolutionary Scores by Consequence (Methylation Level >= 7) (LOEUF Top 20%)", # nolint
+    title = "Distribution of Evolutionary Scores by Consequence (Methylation Level >= 7)", # nolint
     subtitle = "Separated by GERP++, PhyloP and
     CADD Scores",
     y = "Score Value",
@@ -320,7 +288,7 @@ ggplot(melted_data,
 
 
 ### Analyses requested by Nicky
-ndt <- dt[methyl_level >= 7 & loeuf_decile %in% c(1,2)]
+ndt <- dt[methyl_level >= 7]
 
 # Table 1
 dt[,.N, by=consequence] %>% View

@@ -32,7 +32,7 @@ opt <- parse_args(opt_parser)
 log_info("Loading dataset")
  # Read and process data
 dt <- fread(opt$input)
-log_inf("Finished loading dataset")
+log_info("Finished loading dataset")
 
 
 log_info("Data processing")
@@ -46,7 +46,7 @@ dt[is.na(methyl_level), methyl_level := 0]
 
 dt[, frequency_status := ifelse(
     (gnomad_ac > 1 | ukbb_ac > 1) |
-    (gnomad_singleton == 1 & ukbb_singleton == 1),
+    (gnomad_ac == 1 & ukbb_ac == 1),
     "Observed",
     "Not Observed")]
 
@@ -56,7 +56,9 @@ dt[,
         gsub("PRIME", "'", gsub("_", " ", consequence)))
 ]
 
-log_info("Finished data processing")
+log_info("Finished data processing. Writing to file")
 
 # Write the output
 fwrite(dt, opt$output, sep = "\t")
+
+log_info("Finished writing to file")
