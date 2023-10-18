@@ -10,6 +10,8 @@ library(magrittr)
 library(optparse)
 library(scales)
 library(tools)
+library(logger)
+
 
 # Set the number of threads to use
 setDTthreads(0)
@@ -27,8 +29,13 @@ opt_parser <- OptionParser(option_list = option_list)
 opt <- parse_args(opt_parser)
 
 
+log_info("Loading dataset")
  # Read and process data
 dt <- fread(opt$input)
+log_inf("Finished loading dataset")
+
+
+log_info("Data processing")
 
 # Fix methylation for those that are NA
 dt[is.na(methyl_level), methyl_level := 0]
@@ -48,6 +55,8 @@ dt[,
     consequence := toTitleCase(
         gsub("PRIME", "'", gsub("_", " ", consequence)))
 ]
+
+log_info("Finished data processing")
 
 # Write the output
 fwrite(dt, opt$output, sep = "\t")
