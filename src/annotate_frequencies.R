@@ -114,11 +114,6 @@ setkey(ukbb, variant_id)
 dt <- ukbb[dt]
 dt <- gnomad[dt]
 
-# Create a column for the observed in UKBB
-dt[is.na(ukbb_af), observed_in_ukbb := FALSE]
-dt[!is.na(ukbb_af), observed_in_ukbb := TRUE]
-dt[is.na(gnomad_af), observed_in_gnomad := FALSE]
-dt[!is.na(gnomad_af), observed_in_gnomad := TRUE]
 
 # Write the data to file
 fwrite(
