@@ -77,10 +77,6 @@ dt[, observation_status := ifelse(
     "Observed",
     "Not Observed")]
 
-
-
-
-
 # Fix the consequence column
 dt[,
     consequence := toTitleCase(
