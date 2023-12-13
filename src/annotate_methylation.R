@@ -65,6 +65,9 @@ setkey(meth_dt, chrom, pos)
 setkey(dt, chrom, pos)
 dt <- meth_dt[dt]
 
+# Fix methylation for those that are NA
+dt[is.na(methyl_level), methyl_level := 0])]
+
 # Fwrite to file
 fwrite(
     dt,
